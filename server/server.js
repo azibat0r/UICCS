@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const cron = require('node-cron');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
@@ -21,4 +22,10 @@ connectDB().then(() => {
   });
 
   syncInternships(); // run once immediately so the feed isn't empty
+
+  
+  cron.schedule('0 */6 * * *', () => {
+    console.log('[cron] Running scheduled sync...');
+    syncInternships();
+  });
 });
