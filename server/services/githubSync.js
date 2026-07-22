@@ -28,13 +28,13 @@ async function syncInternships() {
         datePosted: toDate(item.date_posted),
       };
 
-      const result = await Job.findOneAndUpdate(
+      const result = await Job.updateOne(
         { externalId: item.id },
         { $set: doc },
-        { upsert: true, new: true, rawResult: true }
+        { upsert: true }
       );
 
-      if (result.lastErrorObject?.upserted) {
+      if (result.upsertedCount > 0) {
         added += 1;
       } else {
         updated += 1;
