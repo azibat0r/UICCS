@@ -4,6 +4,8 @@ const Job = require('../models/Job');
 const LISTINGS_URL =
   'https://raw.githubusercontent.com/vanshb03/Summer2027-Internships/dev/.github/scripts/listings.json';
 
+let lastSyncedAt = null;
+
 function toDate(unixSeconds) {
   return unixSeconds ? new Date(unixSeconds * 1000) : undefined;
 }
@@ -16,7 +18,7 @@ async function syncInternships() {
     let updated = 0;
 
     for (const item of listings) {
-      if (!item.id || !item.is_visible) continue; // skip hidden/malformed entries
+      if (!item.id || !item.is_visible) continue;
 
       const doc = {
         externalId: item.id,
@@ -41,10 +43,11 @@ async function syncInternships() {
       }
     }
 
+    lastSyncedAt = new Date();
     console.log(`[sync] +${added} added, ${updated} updated`);
   } catch (err) {
     console.error('[sync] failed:', err.message);
   }
 }
 
-module.exports = { syncInternships };
+module.exports = { syncInternships, getLastSyncedAt: () => lastSyncedAt };

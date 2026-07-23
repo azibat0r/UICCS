@@ -1,5 +1,6 @@
 const express = require('express');
 const Job = require('../models/Job');
+const { getLastSyncedAt } = require('../services/githubSync');
 
 const router = express.Router();
 
@@ -11,6 +12,11 @@ router.get('/', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Failed to load jobs' });
   }
+});
+
+// GET /api/jobs/sync-status - returns when the feed last synced
+router.get('/sync-status', (req, res) => {
+  res.json({ lastSyncedAt: getLastSyncedAt() });
 });
 
 module.exports = router;
