@@ -5,8 +5,6 @@ const Group = require('../models/Group');
 const router = express.Router();
 const jwtSecret = 'uiccs-secret-key-change-later'; // must match auth.js exactly
 
-// Reads the cookie and tells us which user is making the request.
-// Every route below that needs to know "who's asking" uses this first.
 function getUserIdFromReq(req) {
   return new Promise((resolve, reject) => {
     const { token } = req.cookies;
@@ -18,24 +16,29 @@ function getUserIdFromReq(req) {
   });
 }
 
-// GET /api/groups - all groups, with creator info populated
+// The fields we're willing to expose about each member on a group.
+// Note: never include password here.
+const MEMBER_FIELDS = 'name lastKnownSubmissionAt';
+
 router.get('/', async (req, res) => {
-  const groups = await Group.find().populate('createdBy', 'name');
+  const groups = await Group.find()
+    .populate('createdBy', 'name')
+    .populate('members', MEMBER_FIELDS);
   res.json(groups);
 });
 
-// GET /api/groups/mine - groups the logged-in user belongs to
 router.get('/mine', async (req, res) => {
   try {
     const userId = await getUserIdFromReq(req);
-    const groups = await Group.find({ members: userId }).populate('createdBy', 'name');
+    const groups = await Group.find({ members: userId })
+      .populate('createdBy', 'name')
+      .populate('members', MEMBER_FIELDS);
     res.json(groups);
   } catch {
     res.status(401).json({ error: 'Not logged in' });
   }
 });
 
-// POST /api/groups - create a new group
 router.post('/', async (req, res) => {
   try {
     const userId = await getUserIdFromReq(req);
@@ -49,7 +52,7 @@ router.post('/', async (req, res) => {
       askToJoin,
       memberCap,
       createdBy: userId,
-      members: [userId], // creator automatically joins their own group
+      members: [userId],
     });
 
     res.json(group);
@@ -58,7 +61,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// POST /api/groups/:id/join - join an existing group
 router.post('/:id/join', async (req, res) => {
   try {
     const userId = await getUserIdFromReq(req);
@@ -80,7 +82,6 @@ router.post('/:id/join', async (req, res) => {
   }
 });
 
-// POST /api/groups/:id/leave - leave a group you're a member of
 router.post('/:id/leave', async (req, res) => {
   try {
     const userId = await getUserIdFromReq(req);

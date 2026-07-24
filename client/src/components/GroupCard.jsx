@@ -1,3 +1,14 @@
+function submittedToday(dateStr) {
+  if (!dateStr) return false;
+  const date = new Date(dateStr);
+  const now = new Date();
+  return (
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate()
+  );
+}
+
 export default function GroupCard({ group, onJoin, onLeave, isMember }) {
   return (
     <div className="rounded-xl border border-(--color-border) bg-(--color-surface) p-5">
@@ -24,6 +35,27 @@ export default function GroupCard({ group, onJoin, onLeave, isMember }) {
         <span>·</span>
         <span>{group.askToJoin ? 'Approval required' : 'Open to join'}</span>
       </div>
+
+      {isMember && group.members?.length > 0 && (
+        <div className="mt-4 border-t border-(--color-border) pt-3">
+          <p className="text-xs text-(--color-text-muted) mb-2">Today's activity</p>
+          <div className="flex flex-col gap-1.5">
+            {group.members.map((member) => {
+              const done = submittedToday(member.lastKnownSubmissionAt);
+              return (
+                <div key={member._id} className="flex items-center justify-between text-sm">
+                  <span>{member.name}</span>
+                  <span
+                    className={`inline-flex h-3 w-3 rounded-full border ${
+                      done ? 'bg-green-500 border-green-400' : 'bg-red-500 border-red-400'
+                    }`}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {onJoin && !isMember && (
         <button
