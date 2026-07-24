@@ -6,10 +6,12 @@ require('dotenv').config();
 const connectDB = require('./config/db');
 const jobsRouter = require('./routes/jobs');
 const { syncInternships } = require('./services/githubSync');
+const { checkAllSubmissions } = require('./services/submissionCheck');
 
 const app = express();
 
-app.use(cors({ origin: process.env.CLIENT_ORIGIN, credentials: true }));app.use(express.json());
+app.use(cors({ origin: process.env.CLIENT_ORIGIN, credentials: true }));
+app.use(express.json());
 
 app.use('/api/jobs', jobsRouter);
 
@@ -30,10 +32,15 @@ connectDB().then(() => {
   });
 
   syncInternships(); // run once immediately so the feed isn't empty
+  checkAllSubmissions(); // same idea, for practice submissions
 
-  
   cron.schedule('0 */6 * * *', () => {
-    console.log('[cron] Running scheduled sync...');
+    console.log('[cron] Running scheduled internship sync...');
     syncInternships();
+  });
+
+  cron.schedule('*/30 * * * *', () => {
+    console.log('[cron] Running scheduled submission check...');
+    checkAllSubmissions();
   });
 });
