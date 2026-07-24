@@ -9,12 +9,20 @@ const { syncInternships } = require('./services/githubSync');
 
 const app = express();
 
-app.use(cors({ origin: process.env.CLIENT_ORIGIN }));
-app.use(express.json());
+app.use(cors({ origin: process.env.CLIENT_ORIGIN, credentials: true }));app.use(express.json());
 
 app.use('/api/jobs', jobsRouter);
 
 const PORT = process.env.PORT || 4000;
+
+const cookieParser = require('cookie-parser');
+const authRouter = require('./routes/auth');
+
+app.use(cookieParser());
+app.use('/api/auth', authRouter);
+
+const groupsRouter = require('./routes/groups');
+app.use('/api/groups', groupsRouter);
 
 connectDB().then(() => {
   app.listen(PORT, () => {
