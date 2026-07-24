@@ -65,8 +65,8 @@ async function checkAllSubmissions() {
       latest = await getLatestNeetCodeCommit(user.neetcodeGithubRepo);
     }
 
-console.log(
-      `[submission-check] ${user.name}: latest=${latest}, previouslyKnown=${user.lastKnownSubmissionAt}`
+    console.log(
+      `[submission-check] ${user.name}: leetcode=${user.leetcodeUsername}, neetcodeRepo=${user.neetcodeGithubRepo}, latest=${latest}`
     );
 
     if (latest && (!user.lastKnownSubmissionAt || latest > user.lastKnownSubmissionAt)) {
