@@ -20,6 +20,7 @@ export default function Navbar() {
         <div className="flex items-center gap-8 text-sm text-(--color-text-muted)">
           <Link to="/" className="hover:text-(--color-text) transition">Home</Link>
           <Link to="/feed" className="hover:text-(--color-text) transition">Internship Feed</Link>
+          <Link to="/groups" className="hover:text-(--color-text) transition">Study Groups</Link>
           <Link to="/contact" className="hover:text-(--color-text) transition">Contact</Link>
         </div>
 

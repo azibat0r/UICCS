@@ -45,8 +45,8 @@ router.get('/profile', (req, res) => {
   if (token) {
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
       if (err) throw err;
-      const { name, email, _id } = await User.findById(userData.id);
-      res.json({ name, email, _id });
+      const { name, email, _id, leetcodeUsername, neetcodeGithubRepo } = await User.findById(userData.id);
+      res.json({ name, email, _id, leetcodeUsername, neetcodeGithubRepo });
     });
   } else {
     res.json(null);
@@ -55,6 +55,31 @@ router.get('/profile', (req, res) => {
 
 router.post('/logout', (req, res) => {
   res.cookie('token', '').json(true);
+});
+
+router.post('/link-practice-account', async (req, res) => {
+  const { token } = req.cookies;
+  if (!token) return res.status(401).json('Not logged in');
+
+  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    if (err) return res.status(401).json('Not logged in');
+
+    const { leetcodeUsername, neetcodeGithubRepo } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      userData.id,
+      { leetcodeUsername, neetcodeGithubRepo },
+      { new: true }
+    );
+
+    res.json({
+      name: user.name,
+      email: user.email,
+      _id: user._id,
+      leetcodeUsername: user.leetcodeUsername,
+      neetcodeGithubRepo: user.neetcodeGithubRepo,
+    });
+  });
 });
 
 module.exports = router;

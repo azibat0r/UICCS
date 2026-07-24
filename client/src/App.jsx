@@ -5,6 +5,7 @@ import InternshipFeed from './pages/InternshipFeed.jsx';
 import Contact from './pages/Contact.jsx';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
+import StudyGroups from './pages/StudyGroups.jsx';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/groups" element={<StudyGroups />} />
       </Routes>
     </div>
   );

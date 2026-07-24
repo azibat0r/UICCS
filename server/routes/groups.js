@@ -80,4 +80,20 @@ router.post('/:id/join', async (req, res) => {
   }
 });
 
+// POST /api/groups/:id/leave - leave a group you're a member of
+router.post('/:id/leave', async (req, res) => {
+  try {
+    const userId = await getUserIdFromReq(req);
+    const group = await Group.findById(req.params.id);
+
+    if (!group) return res.status(404).json({ error: 'Group not found' });
+
+    group.members = group.members.filter((memberId) => memberId.toString() !== userId);
+    await group.save();
+    res.json(group);
+  } catch {
+    res.status(401).json({ error: 'Not logged in' });
+  }
+});
+
 module.exports = router;
