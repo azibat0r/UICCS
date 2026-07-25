@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const Group = require('../models/Group');
 
 const router = express.Router();
-const jwtSecret = 'uiccs-secret-key-change-later';
+const jwtSecret = process.env.JWT_SECRET;
 
 function getUserIdFromReq(req) {
   return new Promise((resolve, reject) => {

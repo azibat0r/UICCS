@@ -8,7 +8,7 @@ const { verifyLeetCodeUsername, verifyGithubRepo } = require('../services/submis
 const router = express.Router();
 
 const bcryptSalt = bcrypt.genSaltSync(10);
-const jwtSecret = 'uiccs-secret-key-change-later';
+const jwtSecret = process.env.JWT_SECRET;
 
 // Cross-site cookies (different domains for frontend/backend) require
 // these exact attributes, or browsers silently refuse to send them back.
