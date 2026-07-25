@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useUser } from '../context/useUser.js';
 import LinkAccountModal from './LinkAccountModal.jsx';
+import { API_URL } from '../config.js';
 
 export default function AccountSettingsBar() {
   const { user, setUser } = useUser();
@@ -28,7 +29,7 @@ export default function AccountSettingsBar() {
   }
 
   async function doUnlink(platform) {
-    const res = await fetch('http://localhost:4000/api/auth/unlink-practice-account', {
+    const res = await fetch('${API_URL}/api/auth/unlink-practice-account', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

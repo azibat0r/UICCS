@@ -14,7 +14,7 @@ export default function CreateGroupForm({ onCreated }) {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:4000/api/groups', {
+      const res = await fetch('${API_URL}/api/groups', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

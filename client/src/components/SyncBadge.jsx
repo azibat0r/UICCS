@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { API_URL } from '../config.js';
 
 function timeAgo(dateStr) {
   if (!dateStr) return 'never';
@@ -14,7 +15,7 @@ export default function SyncBadge() {
   const [lastSyncedAt, setLastSyncedAt] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/jobs/sync-status')
+    fetch('${API_URL}/api/jobs/sync-status')
       .then((res) => res.json())
       .then((data) => setLastSyncedAt(data.lastSyncedAt))
       .catch(() => {});

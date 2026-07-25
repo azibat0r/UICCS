@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { API_URL } from '../config.js';
 
 function formatDate(dateStr) {
   if (!dateStr) return '-';
@@ -17,7 +18,7 @@ export default function JobsTable() {
   });
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/jobs')
+    fetch('${API_URL}/api/jobs')
       .then((res) => res.json())
       .then((data) => setJobs(data))
       .catch(() => setError('Could not load internships.'))

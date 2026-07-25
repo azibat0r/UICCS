@@ -6,6 +6,7 @@ import LinkAccountModal from '../components/LinkAccountModal.jsx';
 import GroupDetailModal from '../components/GroupDetailModal.jsx';
 import GroupActivityModal from '../components/GroupActivityModal.jsx';
 import AccountSettingsBar from '../components/AccountSettingsBar.jsx';
+import { API_URL } from '../config.js';
 
 export default function StudyGroups() {
   const { user, setUser } = useUser();
@@ -19,12 +20,12 @@ export default function StudyGroups() {
 
   const loadGroups = useCallback(() => {
     setLoading(true);
-    fetch('http://localhost:4000/api/groups')
+    fetch('${API_URL}/api/groups')
       .then((res) => res.json())
       .then(setAllGroups);
 
     if (user) {
-      fetch('http://localhost:4000/api/groups/mine', { credentials: 'include' })
+      fetch('${API_URL}/api/groups/mine', { credentials: 'include' })
         .then((res) => res.json())
         .then(setMyGroups)
         .finally(() => setLoading(false));
@@ -38,7 +39,7 @@ export default function StudyGroups() {
   }, [loadGroups]);
 
   async function actuallyJoin(groupId) {
-    const res = await fetch(`http://localhost:4000/api/groups/${groupId}/join`, {
+    const res = await fetch(`${API_URL}/api/groups/${groupId}/join`, {
       method: 'POST',
       credentials: 'include',
     });
@@ -55,7 +56,7 @@ export default function StudyGroups() {
   }
 
   async function handleLeave(groupId) {
-    const res = await fetch(`http://localhost:4000/api/groups/${groupId}/leave`, {
+    const res = await fetch(`${API_URL}/api/groups/${groupId}/leave`, {
       method: 'POST',
       credentials: 'include',
     });

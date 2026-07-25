@@ -3,6 +3,7 @@ import { useUser } from '../context/useUser.js';
 import { getUserColor } from '../utils/userColors.js';
 import WeekStrip from './WeekStrip.jsx';
 import TimelineModal from './TimelineModal.jsx';
+import { API_URL } from '../config.js';
 
 function formatDateTime(dateStr) {
   const d = new Date(dateStr);
@@ -21,7 +22,7 @@ export default function GroupActivityModal({ group, onClose }) {
   const [showTimeline, setShowTimeline] = useState(false);
 
   useEffect(() => {
-    fetch(`http://localhost:4000/api/submissions/group/${group._id}`, {
+    fetch(`${API_URL}/api/submissions/group/${group._id}`, {
       credentials: 'include',
     })
       .then((res) => res.json())

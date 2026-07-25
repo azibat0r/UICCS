@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/useUser.js';
 import AccountSettingsBar from '../components/AccountSettingsBar.jsx';
 import DeleteAccountModal from '../components/DeleteAccountModal.jsx';
+import { API_URL } from '../config.js';
 
 export default function Profile() {
   const { user, setUser } = useUser();
@@ -25,7 +26,7 @@ export default function Profile() {
     setNameError('');
     setNameSaving(true);
 
-    const res = await fetch('http://localhost:4000/api/auth/change-username', {
+    const res = await fetch('${API_URL}/api/auth/change-username', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -44,7 +45,7 @@ export default function Profile() {
   }
 
   async function handleDeleteAccount() {
-    await fetch('http://localhost:4000/api/auth/delete-account', {
+    await fetch('${API_URL}/api/auth/delete-account', {
       method: 'DELETE',
       credentials: 'include',
     });

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { API_URL } from '../config.js';
 
 export default function LinkAccountModal({ platform, onSaved, onCancel }) {
   const [value, setValue] = useState('');
@@ -18,7 +19,7 @@ export default function LinkAccountModal({ platform, onSaved, onCancel }) {
 
     setSaving(true);
     try {
-      const res = await fetch('http://localhost:4000/api/auth/link-practice-account', {
+      const res = await fetch('${API_URL}/api/auth/link-practice-account', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
