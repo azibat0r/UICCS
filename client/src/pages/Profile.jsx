@@ -16,7 +16,7 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div className="w-full px-6 lg:px-12 py-16">
+      <div className="w-full px-4 sm:px-6 lg:px-12 py-10 sm:py-16">
         <p className="text-(--color-text-muted)">Log in to view your profile.</p>
       </div>
     );

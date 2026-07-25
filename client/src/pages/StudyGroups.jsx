@@ -74,7 +74,7 @@ export default function StudyGroups() {
   const myGroupIds = new Set(myGroups.map((g) => g._id));
 
   return (
-    <div className="w-full px-6 lg:px-12 py-16">
+    <div className="w-full px-4 sm:px-6 lg:px-12 py-10 sm:py-16">
       <h1 className="text-3xl font-bold mb-6">Study Groups</h1>
 
       <AccountSettingsBar />
