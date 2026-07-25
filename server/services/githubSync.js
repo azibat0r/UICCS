@@ -1,14 +1,12 @@
 const axios = require('axios');
 const Job = require('../models/Job');
 
+let lastSyncedAt = null;
+
 function toDate(unixSeconds) {
   return unixSeconds ? new Date(unixSeconds * 1000) : undefined;
 }
 
-// The real identity of a listing is "this company, this role" - not the
-// URL, since companies like Jane Street post one apply link per office for
-// what is genuinely the same role. Merging on this key means every office
-// becomes one entry with multiple locations, instead of duplicate rows.
 function dedupeKey(company, title) {
   const c = (company || '').trim().toLowerCase();
   const t = (title || '').trim().toLowerCase();
@@ -63,8 +61,6 @@ async function syncInternships() {
       }),
     ]);
 
-    // Group everything from both feeds by company+title, merging locations
-    // so the same role posted per-office (or by both feeds) becomes ONE entry.
     const grouped = new Map();
 
     for (const listing of [...fromVansh, ...fromZshah]) {
@@ -82,7 +78,6 @@ async function syncInternships() {
         });
       } else {
         listing.locations.forEach((loc) => existing.locations.add(loc));
-        // Keep the most recent posting date and its matching url across duplicates.
         if (listing.datePosted && (!existing.datePosted || listing.datePosted > existing.datePosted)) {
           existing.datePosted = listing.datePosted;
           existing.url = listing.url;
@@ -116,11 +111,12 @@ async function syncInternships() {
       }
     }
 
-    // Anything no longer present in either feed gets deactivated.
     const deactivateResult = await Job.updateMany(
       { externalId: { $nin: Array.from(seenIds) }, active: true },
       { $set: { active: false } }
     );
+
+    lastSyncedAt = new Date();
 
     console.log(
       `[sync] +${added} added, ${updated} updated, ${deactivateResult.modifiedCount || 0} deactivated`
@@ -130,4 +126,4 @@ async function syncInternships() {
   }
 }
 
-module.exports = { syncInternships };
+module.exports = { syncInternships, getLastSyncedAt: () => lastSyncedAt };
