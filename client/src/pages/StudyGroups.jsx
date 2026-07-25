@@ -22,12 +22,12 @@ export default function StudyGroups() {
     setLoading(true);
     fetch(`${API_URL}/api/groups`)
       .then((res) => res.json())
-      .then(setAllGroups);
+      .then((data) => setAllGroups(Array.isArray(data) ? data : []));
 
     if (user) {
       fetch(`${API_URL}/api/groups/mine`, { credentials: 'include' })
         .then((res) => res.json())
-        .then(setMyGroups)
+        .then((data) => setMyGroups(Array.isArray(data) ? data : []))
         .finally(() => setLoading(false));
     } else {
       setLoading(false);

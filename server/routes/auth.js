@@ -10,6 +10,14 @@ const router = express.Router();
 const bcryptSalt = bcrypt.genSaltSync(10);
 const jwtSecret = 'uiccs-secret-key-change-later';
 
+// Cross-site cookies (different domains for frontend/backend) require
+// these exact attributes, or browsers silently refuse to send them back.
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: true,
+  sameSite: 'none',
+};
+
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -32,7 +40,7 @@ router.post('/login', async (req, res) => {
     if (passOk) {
       jwt.sign({ email: userDoc.email, id: userDoc._id }, jwtSecret, {}, (err, token) => {
         if (err) throw err;
-        res.cookie('token', token).json(userDoc);
+        res.cookie('token', token, COOKIE_OPTIONS).json(userDoc);
       });
     } else {
       res.status(422).json('pass not ok');
@@ -56,14 +64,9 @@ router.get('/profile', (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-  res.cookie('token', '').json(true);
+  res.clearCookie('token', COOKIE_OPTIONS).json(true);
 });
 
-// POST /api/auth/link-practice-account
-// body: { platform: 'leetcode' | 'neetcode', value: '...' }
-// Sets ONLY the specified platform's field - the other stays untouched,
-// so a user can have both linked at once. Rejects values already claimed
-// by a different user.
 router.post('/link-practice-account', async (req, res) => {
   const { token } = req.cookies;
   if (!token) return res.status(401).json({ error: 'Not logged in' });
@@ -123,11 +126,6 @@ router.post('/link-practice-account', async (req, res) => {
   });
 });
 
-// POST /api/auth/unlink-practice-account
-// body: { platform: 'leetcode' | 'neetcode' }
-// Only removes groups/progress-tracking if this was the user's LAST
-// remaining linked account. If the other platform is still linked,
-// their group memberships and history stay intact.
 router.post('/unlink-practice-account', async (req, res) => {
   const { token } = req.cookies;
   if (!token) return res.status(401).json({ error: 'Not logged in' });
@@ -156,19 +154,6 @@ router.post('/unlink-practice-account', async (req, res) => {
   });
 });
 
-function pickUserFields(user) {
-  return {
-    name: user.name,
-    email: user.email,
-    _id: user._id,
-    leetcodeUsername: user.leetcodeUsername,
-    neetcodeGithubRepo: user.neetcodeGithubRepo,
-  };
-}
-
-
-// POST /api/auth/change-username
-// body: { name: '...' }
 router.post('/change-username', async (req, res) => {
   const { token } = req.cookies;
   if (!token) return res.status(401).json({ error: 'Not logged in' });
@@ -196,9 +181,6 @@ router.post('/change-username', async (req, res) => {
   });
 });
 
-// DELETE /api/auth/delete-account
-// Permanently removes the account: leaves every group (deleting any that
-// become empty), deletes their submission history, then deletes the user.
 router.delete('/delete-account', async (req, res) => {
   const { token } = req.cookies;
   if (!token) return res.status(401).json({ error: 'Not logged in' });
@@ -216,8 +198,18 @@ router.delete('/delete-account', async (req, res) => {
     await Submission.deleteMany({ user: userData.id });
     await User.findByIdAndDelete(userData.id);
 
-    res.cookie('token', '').json({ deleted: true });
+    res.clearCookie('token', COOKIE_OPTIONS).json({ deleted: true });
   });
 });
+
+function pickUserFields(user) {
+  return {
+    name: user.name,
+    email: user.email,
+    _id: user._id,
+    leetcodeUsername: user.leetcodeUsername,
+    neetcodeGithubRepo: user.neetcodeGithubRepo,
+  };
+}
 
 module.exports = router;
