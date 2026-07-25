@@ -6,6 +6,7 @@ import Contact from './pages/Contact.jsx';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
 import StudyGroups from './pages/StudyGroups.jsx';
+import Profile from './pages/Profile.jsx';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/groups" element={<StudyGroups />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </div>
   );

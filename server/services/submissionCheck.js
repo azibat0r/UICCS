@@ -2,7 +2,6 @@ const axios = require('axios');
 const User = require('../models/User');
 const Submission = require('../models/Submission');
 
-// Gets a LeetCode user's recent Accepted submissions (title + when).
 async function getRecentLeetCodeSubmissions(username, limit = 20) {
   try {
     const query = `
@@ -13,12 +12,10 @@ async function getRecentLeetCodeSubmissions(username, limit = 20) {
         }
       }
     `;
-
     const { data } = await axios.post('https://leetcode.com/graphql', {
       query,
       variables: { username, limit },
     });
-
     const submissions = data?.data?.recentAcSubmissionList || [];
     return submissions.map((s) => ({
       problemName: s.title,
@@ -31,16 +28,14 @@ async function getRecentLeetCodeSubmissions(username, limit = 20) {
   }
 }
 
-// Gets a NeetCode-synced GitHub repo's recent commits (best-effort problem name from commit message).
 async function getRecentNeetCodeCommits(repoFullName, limit = 20) {
   try {
     const { data } = await axios.get(
       `https://api.github.com/repos/${repoFullName}/commits`,
       { params: { per_page: limit } }
     );
-
     return (data || []).map((c) => ({
-      problemName: c.commit.message.split('\n')[0], // first line of the commit message
+      problemName: c.commit.message.split('\n')[0],
       timestamp: new Date(c.commit.author.date),
       source: 'neetcode',
     }));
@@ -50,8 +45,38 @@ async function getRecentNeetCodeCommits(repoFullName, limit = 20) {
   }
 }
 
-// Runs through every user who's linked an account, finds submissions newer
-// than what we've already recorded, and saves each new one individually.
+// Used to validate a username BEFORE saving it - checks existence only,
+// doesn't care whether they've solved anything yet.
+async function verifyLeetCodeUsername(username) {
+  try {
+    const query = `
+      query userExists($username: String!) {
+        matchedUser(username: $username) { username }
+      }
+    `;
+    const { data } = await axios.post('https://leetcode.com/graphql', {
+      query,
+      variables: { username },
+    });
+    return !!data?.data?.matchedUser;
+  } catch {
+    return false;
+  }
+}
+
+// Used to validate a repo BEFORE saving it - a plain existence check.
+async function verifyGithubRepo(repoFullName) {
+  try {
+    await axios.get(`https://api.github.com/repos/${repoFullName}`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Runs through every user with at least one linked account, checks BOTH
+// sources if both are linked, and records any submissions newer than
+// what we've already seen.
 async function checkAllSubmissions() {
   const users = await User.find({
     $or: [{ leetcodeUsername: { $ne: null } }, { neetcodeGithubRepo: { $ne: null } }],
@@ -63,9 +88,10 @@ async function checkAllSubmissions() {
     let recent = [];
 
     if (user.leetcodeUsername) {
-      recent = await getRecentLeetCodeSubmissions(user.leetcodeUsername);
-    } else if (user.neetcodeGithubRepo) {
-      recent = await getRecentNeetCodeCommits(user.neetcodeGithubRepo);
+      recent = recent.concat(await getRecentLeetCodeSubmissions(user.leetcodeUsername));
+    }
+    if (user.neetcodeGithubRepo) {
+      recent = recent.concat(await getRecentNeetCodeCommits(user.neetcodeGithubRepo));
     }
 
     const newOnes = user.lastKnownSubmissionAt
@@ -82,7 +108,7 @@ async function checkAllSubmissions() {
         });
         totalNewSubmissions += 1;
       } catch {
-        // Duplicate (already recorded) - safe to ignore, this is expected sometimes.
+        // Duplicate - already recorded, safe to ignore.
       }
     }
 
@@ -100,4 +126,8 @@ async function checkAllSubmissions() {
   );
 }
 
-module.exports = { checkAllSubmissions };
+module.exports = {
+  checkAllSubmissions,
+  verifyLeetCodeUsername,
+  verifyGithubRepo,
+};

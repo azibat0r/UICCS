@@ -85,7 +85,9 @@ export default function GroupActivityModal({ group, onClose }) {
         </div>
       </div>
 
-      {showTimeline && <TimelineModal onClose={() => setShowTimeline(false)} />}
+      {showTimeline && (
+        <TimelineModal submissions={myFeed} onClose={() => setShowTimeline(false)} />
+      )}
     </div>
   );
 }

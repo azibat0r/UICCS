@@ -27,7 +27,9 @@ export default function Navbar() {
         <div className="flex items-center gap-4 text-sm">
           {user ? (
             <>
-              <span className="text-(--color-text-muted)">{user.name}</span>
+              <Link to="/profile" className="text-(--color-text-muted) hover:text-(--color-text) transition">
+                {user.name}
+              </Link>
               <button
                 onClick={handleLogout}
                 className="rounded-md border border-(--color-border) px-3 py-1.5 hover:border-(--color-accent) transition"

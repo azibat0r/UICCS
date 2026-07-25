@@ -2,11 +2,12 @@ const mongoose = require('mongoose');
 
 const jobSchema = new mongoose.Schema(
   {
-    externalId: { type: String, required: true, unique: true },
+    externalId: { type: String, required: true, unique: true }, // derived from company+title now
     company: { type: String, required: true },
     title: { type: String, required: true },
     locations: [{ type: String }],
     url: { type: String },
+    feedSource: { type: String },
     active: { type: Boolean, default: true },
     datePosted: { type: Date },
   },

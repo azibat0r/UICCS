@@ -90,6 +90,13 @@ router.post('/:id/leave', async (req, res) => {
     if (!group) return res.status(404).json({ error: 'Group not found' });
 
     group.members = group.members.filter((m) => m.user.toString() !== userId);
+
+    // A group with nobody left in it shouldn't keep existing.
+    if (group.members.length === 0) {
+      await Group.findByIdAndDelete(group._id);
+      return res.json({ deleted: true });
+    }
+
     await group.save();
     res.json(group);
   } catch {

@@ -1,14 +1,3 @@
-function submittedToday(dateStr) {
-  if (!dateStr) return false;
-  const date = new Date(dateStr);
-  const now = new Date();
-  return (
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate()
-  );
-}
-
 export default function GroupDetailModal({ group, onClose, onLeave, onViewActivity }) {
   if (!group) return null;
 
@@ -51,26 +40,13 @@ export default function GroupDetailModal({ group, onClose, onLeave, onViewActivi
         </div>
 
         <div className="mt-6 border-t border-(--color-border) pt-4">
-          <p className="text-sm font-medium mb-3">Today's activity</p>
-          <div className="flex flex-col gap-2">
-            {group.members?.map((member) => {
-              const done = submittedToday(member.user?.lastKnownSubmissionAt);
-              return (
-                <div key={member.user?._id} className="flex items-center justify-between text-sm">
-                  <span>{member.user?.name}</span>
-                  <span className="flex items-center gap-2">
-                    <span
-                      className={`inline-flex h-3 w-3 rounded-full border ${
-                        done ? 'bg-green-500 border-green-400' : 'bg-red-500 border-red-400'
-                      }`}
-                    />
-                    <span className="text-xs text-(--color-text-muted)">
-                      {done ? 'Submitted today' : 'Not yet'}
-                    </span>
-                  </span>
-                </div>
-              );
-            })}
+          <p className="text-sm font-medium mb-3">Members</p>
+          <div className="flex flex-col gap-1.5">
+            {group.members?.map((member) => (
+              <span key={member.user?._id} className="text-sm">
+                {member.user?.name}
+              </span>
+            ))}
           </div>
         </div>
 

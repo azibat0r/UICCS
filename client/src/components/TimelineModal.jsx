@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 function sameDay(a, b) {
   return (
@@ -8,15 +8,8 @@ function sameDay(a, b) {
   );
 }
 
-export default function TimelineModal({ onClose }) {
-  const [submissions, setSubmissions] = useState([]);
+export default function TimelineModal({ submissions, onClose }) {
   const [viewDate, setViewDate] = useState(new Date());
-
-  useEffect(() => {
-    fetch('http://localhost:4000/api/submissions/mine', { credentials: 'include' })
-      .then((res) => res.json())
-      .then(setSubmissions);
-  }, []);
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
