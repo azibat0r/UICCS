@@ -24,10 +24,13 @@ export default function Navbar() {
           <Link to="/contact" className="hover:text-(--color-text) transition">Contact</Link>
         </div>
 
-        <div className="flex items-center gap-4 text-sm">
+        <div className="flex items-center gap-3 text-sm">
           {user ? (
             <>
-              <Link to="/profile" className="text-(--color-text-muted) hover:text-(--color-text) transition">
+              <Link
+                to="/profile"
+                className="rounded-md border border-(--color-border) px-3 py-1.5 hover:border-(--color-accent) transition"
+              >
                 {user.name}
               </Link>
               <button
