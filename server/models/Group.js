@@ -3,14 +3,19 @@ const { Schema } = mongoose;
 
 const GroupSchema = new Schema(
   {
-    focus: { type: String, required: true },        // e.g. "Daily LeetCode Grind", "Blind 75"
-    description: String,                              // what the group will actually work on
+    focus: { type: String, required: true },
+    description: String,
     format: { type: String, enum: ['In Person', 'Remote'], required: true },
-    frequency: { type: String, required: true },      // "Daily", "Weekly", "Biweekly"
-    askToJoin: { type: Boolean, default: false },     // false = open, true = approval required
+    frequency: { type: String, required: true },
+    askToJoin: { type: Boolean, default: false },
     memberCap: { type: Number, default: 20 },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    members: [
+      {
+        user: { type: Schema.Types.ObjectId, ref: 'User' },
+        joinedAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );

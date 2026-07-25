@@ -1,17 +1,11 @@
-function submittedToday(dateStr) {
-  if (!dateStr) return false;
-  const date = new Date(dateStr);
-  const now = new Date();
+export default function GroupCard({ group, onJoin, onOpen, isMember }) {
   return (
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate()
-  );
-}
-
-export default function GroupCard({ group, onJoin, onLeave, isMember }) {
-  return (
-    <div className="rounded-xl border border-(--color-border) bg-(--color-surface) p-5">
+    <div
+      onClick={isMember ? () => onOpen(group) : undefined}
+      className={`rounded-xl border border-(--color-border) bg-(--color-surface) p-5 ${
+        isMember ? 'cursor-pointer hover:border-(--color-accent) transition' : ''
+      }`}
+    >
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="font-bold text-lg">{group.focus}</h3>
@@ -36,30 +30,12 @@ export default function GroupCard({ group, onJoin, onLeave, isMember }) {
         <span>{group.askToJoin ? 'Approval required' : 'Open to join'}</span>
       </div>
 
-      {isMember && group.members?.length > 0 && (
-        <div className="mt-4 border-t border-(--color-border) pt-3">
-          <p className="text-xs text-(--color-text-muted) mb-2">Today's activity</p>
-          <div className="flex flex-col gap-1.5">
-            {group.members.map((member) => {
-              const done = submittedToday(member.lastKnownSubmissionAt);
-              return (
-                <div key={member._id} className="flex items-center justify-between text-sm">
-                  <span>{member.name}</span>
-                  <span
-                    className={`inline-flex h-3 w-3 rounded-full border ${
-                      done ? 'bg-green-500 border-green-400' : 'bg-red-500 border-red-400'
-                    }`}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
       {onJoin && !isMember && (
         <button
-          onClick={() => onJoin(group._id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onJoin(group._id);
+          }}
           className="mt-4 w-full rounded-md bg-(--color-accent) px-4 py-2 text-sm font-medium text-(--color-bg) hover:opacity-90 transition"
         >
           Join Group
@@ -67,17 +43,7 @@ export default function GroupCard({ group, onJoin, onLeave, isMember }) {
       )}
 
       {isMember && (
-        <div className="mt-4 flex items-center justify-between">
-          <p className="text-sm text-(--color-accent)">You're in this group</p>
-          {onLeave && (
-            <button
-              onClick={() => onLeave(group._id)}
-              className="text-xs text-(--color-text-muted) hover:text-(--color-accent) transition underline"
-            >
-              Leave
-            </button>
-          )}
-        </div>
+        <p className="mt-4 text-sm text-(--color-accent)">You're in this group · Click to view</p>
       )}
     </div>
   );

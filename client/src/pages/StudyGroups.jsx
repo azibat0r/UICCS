@@ -3,6 +3,9 @@ import { useUser } from '../context/useUser.js';
 import GroupCard from '../components/GroupCard.jsx';
 import CreateGroupForm from '../components/CreateGroupForm.jsx';
 import LinkAccountModal from '../components/LinkAccountModal.jsx';
+import GroupDetailModal from '../components/GroupDetailModal.jsx';
+import GroupActivityModal from '../components/GroupActivityModal.jsx';
+import AccountSettingsBar from '../components/AccountSettingsBar.jsx';
 
 export default function StudyGroups() {
   const { user, setUser } = useUser();
@@ -11,6 +14,8 @@ export default function StudyGroups() {
   const [myGroups, setMyGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pendingGroupId, setPendingGroupId] = useState(null);
+  const [openGroup, setOpenGroup] = useState(null);
+  const [activityGroup, setActivityGroup] = useState(null);
 
   const loadGroups = useCallback(() => {
     setLoading(true);
@@ -71,6 +76,8 @@ export default function StudyGroups() {
     <div className="w-full px-6 lg:px-12 py-16">
       <h1 className="text-3xl font-bold mb-6">Study Groups</h1>
 
+      <AccountSettingsBar />
+
       <div className="flex gap-2 mb-8 border-b border-(--color-border)">
         {['mine', 'browse', 'create'].map((t) => (
           <button
@@ -99,7 +106,7 @@ export default function StudyGroups() {
             <p className="text-(--color-text-muted)">You haven't joined any groups yet.</p>
           )}
           {myGroups.map((group) => (
-            <GroupCard key={group._id} group={group} isMember onLeave={handleLeave} />
+            <GroupCard key={group._id} group={group} isMember onOpen={setOpenGroup} />
           ))}
         </div>
       )}
@@ -111,7 +118,7 @@ export default function StudyGroups() {
               key={group._id}
               group={group}
               onJoin={user ? handleJoin : null}
-              onLeave={handleLeave}
+              onOpen={setOpenGroup}
               isMember={myGroupIds.has(group._id)}
             />
           ))}
@@ -135,6 +142,22 @@ export default function StudyGroups() {
           onSaved={handleLinkAccountSaved}
           onCancel={() => setPendingGroupId(null)}
         />
+      )}
+
+      {openGroup && (
+        <GroupDetailModal
+          group={openGroup}
+          onClose={() => setOpenGroup(null)}
+          onLeave={handleLeave}
+          onViewActivity={() => {
+            setActivityGroup(openGroup);
+            setOpenGroup(null);
+          }}
+        />
+      )}
+
+      {activityGroup && (
+        <GroupActivityModal group={activityGroup} onClose={() => setActivityGroup(null)} />
       )}
     </div>
   );

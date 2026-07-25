@@ -18,6 +18,12 @@ export default function LinkAccountModal({ onSaved, onCancel }) {
       return;
     }
 
+    // Accept either "owner/repo" or a full GitHub URL and normalize to "owner/repo"
+    const cleanedRepo = neetcodeGithubRepo
+      .trim()
+      .replace(/^https?:\/\/github\.com\//, '')
+      .replace(/\/$/, '');
+
     try {
       const res = await fetch('http://localhost:4000/api/auth/link-practice-account', {
         method: 'POST',
@@ -25,7 +31,7 @@ export default function LinkAccountModal({ onSaved, onCancel }) {
         credentials: 'include',
         body: JSON.stringify({
           leetcodeUsername: method === 'leetcode' ? leetcodeUsername.trim() : undefined,
-          neetcodeGithubRepo: method === 'neetcode' ? neetcodeGithubRepo.trim() : undefined,
+          neetcodeGithubRepo: method === 'neetcode' ? cleanedRepo : undefined,
         }),
       });
 

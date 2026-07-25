@@ -26,13 +26,16 @@ app.use('/api/auth', authRouter);
 const groupsRouter = require('./routes/groups');
 app.use('/api/groups', groupsRouter);
 
+const submissionsRouter = require('./routes/submissions');
+app.use('/api/submissions', submissionsRouter);
+
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
 
-  syncInternships(); // run once immediately so the feed isn't empty
-  checkAllSubmissions(); // same idea, for practice submissions
+  syncInternships();
+  checkAllSubmissions();
 
   cron.schedule('0 */6 * * *', () => {
     console.log('[cron] Running scheduled internship sync...');
