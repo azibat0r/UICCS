@@ -26,7 +26,7 @@ export default function Profile() {
     setNameError('');
     setNameSaving(true);
 
-    const res = await fetch('${API_URL}/api/auth/change-username', {
+    const res = await fetch(`${API_URL}/api/auth/change-username`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -45,7 +45,7 @@ export default function Profile() {
   }
 
   async function handleDeleteAccount() {
-    await fetch('${API_URL}/api/auth/delete-account', {
+    await fetch(`${API_URL}/api/auth/delete-account`, {
       method: 'DELETE',
       credentials: 'include',
     });

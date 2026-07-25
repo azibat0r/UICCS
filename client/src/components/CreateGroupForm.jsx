@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { API_URL } from '../config.js';
 
 export default function CreateGroupForm({ onCreated }) {
   const [focus, setFocus] = useState('');
@@ -14,7 +15,7 @@ export default function CreateGroupForm({ onCreated }) {
     setError('');
 
     try {
-      const res = await fetch('${API_URL}/api/groups', {
+      const res = await fetch(`${API_URL}/api/groups`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

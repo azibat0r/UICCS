@@ -15,7 +15,7 @@ export default function SyncBadge() {
   const [lastSyncedAt, setLastSyncedAt] = useState(null);
 
   useEffect(() => {
-    fetch('${API_URL}/api/jobs/sync-status')
+    fetch(`${API_URL}/api/jobs/sync-status`)
       .then((res) => res.json())
       .then((data) => setLastSyncedAt(data.lastSyncedAt))
       .catch(() => {});

@@ -20,12 +20,12 @@ export default function StudyGroups() {
 
   const loadGroups = useCallback(() => {
     setLoading(true);
-    fetch('${API_URL}/api/groups')
+    fetch(`${API_URL}/api/groups`)
       .then((res) => res.json())
       .then(setAllGroups);
 
     if (user) {
-      fetch('${API_URL}/api/groups/mine', { credentials: 'include' })
+      fetch(`${API_URL}/api/groups/mine`, { credentials: 'include' })
         .then((res) => res.json())
         .then(setMyGroups)
         .finally(() => setLoading(false));

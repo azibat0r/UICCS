@@ -19,7 +19,7 @@ export default function LinkAccountModal({ platform, onSaved, onCancel }) {
 
     setSaving(true);
     try {
-      const res = await fetch('${API_URL}/api/auth/link-practice-account', {
+      const res = await fetch(`${API_URL}/api/auth/link-practice-account`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -50,7 +50,7 @@ export default function LinkAccountModal({ platform, onSaved, onCancel }) {
         <p className="text-sm text-(--color-text-muted) mb-4">
           {platform === 'leetcode'
             ? "We'll verify this is a real LeetCode username before saving."
-            : "Enable GitHub Sync at neetcode.io/profile/github first, then paste the repo it creates."}
+            : 'Enable GitHub Sync at neetcode.io/profile/github first, then paste the repo it creates.'}
         </p>
 
         <input

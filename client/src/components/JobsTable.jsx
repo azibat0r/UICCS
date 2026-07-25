@@ -18,7 +18,7 @@ export default function JobsTable() {
   });
 
   useEffect(() => {
-    fetch('${API_URL}/api/jobs')
+    fetch(`${API_URL}/api/jobs`)
       .then((res) => res.json())
       .then((data) => setJobs(data))
       .catch(() => setError('Could not load internships.'))

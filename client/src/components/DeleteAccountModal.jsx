@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { API_URL } from '../config.js';
 
 export default function DeleteAccountModal({ onConfirm, onCancel }) {
   const [confirming, setConfirming] = useState(false);

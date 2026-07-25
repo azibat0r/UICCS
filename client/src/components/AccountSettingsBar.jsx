@@ -5,9 +5,9 @@ import { API_URL } from '../config.js';
 
 export default function AccountSettingsBar() {
   const { user, setUser } = useUser();
-  const [linkingPlatform, setLinkingPlatform] = useState(null); // 'leetcode' | 'neetcode' | null
+  const [linkingPlatform, setLinkingPlatform] = useState(null);
   const [unlinkChoice, setUnlinkChoice] = useState(false);
-  const [confirmUnlink, setConfirmUnlink] = useState(null); // 'leetcode' | 'neetcode' | null
+  const [confirmUnlink, setConfirmUnlink] = useState(null);
 
   if (!user) return null;
 
@@ -29,7 +29,7 @@ export default function AccountSettingsBar() {
   }
 
   async function doUnlink(platform) {
-    const res = await fetch('${API_URL}/api/auth/unlink-practice-account', {
+    const res = await fetch(`${API_URL}/api/auth/unlink-practice-account`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -141,7 +141,7 @@ export default function AccountSettingsBar() {
             <p className="text-sm text-(--color-text-muted) mb-4">
               {linkedCount === 2
                 ? "Your other linked account keeps tracking your activity, so you'll stay in your groups."
-                : 'This is your only linked account - removing it means you\'ll be taken out of every group you\'re in, since there\'s no source left to verify your activity. Your past history stays recorded, but you\'ll need to link a new account to rejoin.'}
+                : "This is your only linked account - removing it means you'll be taken out of every group you're in, since there's no source left to verify your activity. Your past history stays recorded, but you'll need to link a new account to rejoin."}
             </p>
             <div className="flex gap-2">
               <button

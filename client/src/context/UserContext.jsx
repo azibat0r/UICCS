@@ -7,7 +7,7 @@ export function UserProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('${API_URL}/api/auth/profile', {
+    fetch(`${API_URL}/api/auth/profile`, {
       credentials: 'include',
     })
       .then((res) => res.json())
