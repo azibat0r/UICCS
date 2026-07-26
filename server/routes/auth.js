@@ -10,8 +10,6 @@ const router = express.Router();
 const bcryptSalt = bcrypt.genSaltSync(10);
 const jwtSecret = process.env.JWT_SECRET;
 
-// Cross-site cookies (different domains for frontend/backend) require
-// these exact attributes, or browsers silently refuse to send them back.
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: true,
@@ -39,7 +37,9 @@ router.post('/login', async (req, res) => {
     const passOk = bcrypt.compareSync(password, userDoc.password);
     if (passOk) {
       jwt.sign({ email: userDoc.email, id: userDoc._id }, jwtSecret, {}, (err, token) => {
-        if (err) throw err;
+        if (err) {
+          return res.status(500).json({ error: 'Login failed. Try again.' });
+        }
         res.cookie('token', token, COOKIE_OPTIONS).json(userDoc);
       });
     } else {
@@ -54,9 +54,17 @@ router.get('/profile', (req, res) => {
   const { token } = req.cookies;
   if (token) {
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-      if (err) throw err;
-      const { name, email, _id, leetcodeUsername, neetcodeGithubRepo } = await User.findById(userData.id);
-      res.json({ name, email, _id, leetcodeUsername, neetcodeGithubRepo });
+      if (err) {
+        return res.json(null);
+      }
+      try {
+        const user = await User.findById(userData.id);
+        if (!user) return res.json(null);
+        const { name, email, _id, leetcodeUsername, neetcodeGithubRepo } = user;
+        res.json({ name, email, _id, leetcodeUsername, neetcodeGithubRepo });
+      } catch {
+        res.json(null);
+      }
     });
   } else {
     res.json(null);
