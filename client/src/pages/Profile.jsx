@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/useUser.js';
 import AccountSettingsBar from '../components/AccountSettingsBar.jsx';
 import DeleteAccountModal from '../components/DeleteAccountModal.jsx';
+import ProfileDetailsForm from '../components/ProfileDetailsForm.jsx';
 import { API_URL } from '../config.js';
 
 export default function Profile() {
@@ -16,7 +17,7 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div className="w-full px-4 sm:px-6 lg:px-12 py-10 sm:py-16">
+      <div className="w-full px-6 lg:px-12 py-16">
         <p className="text-(--color-text-muted)">Log in to view your profile.</p>
       </div>
     );
@@ -75,6 +76,11 @@ export default function Profile() {
           </button>
         </div>
         {nameError && <p className="text-(--color-accent) text-sm mt-2">{nameError}</p>}
+      </div>
+
+      <div className="mb-8">
+        <p className="text-sm text-(--color-text-muted) mb-2">Career details</p>
+        <ProfileDetailsForm />
       </div>
 
       <div className="mb-8">

@@ -26,6 +26,9 @@ app.use('/api/auth', authRouter);
 const groupsRouter = require('./routes/groups');
 app.use('/api/groups', groupsRouter);
 
+const surveyRouter = require('./routes/survey');
+app.use('/api/survey', surveyRouter);
+
 const submissionsRouter = require('./routes/submissions');
 app.use('/api/submissions', submissionsRouter);
 
