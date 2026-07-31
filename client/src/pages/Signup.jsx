@@ -41,12 +41,14 @@ export default function Signup() {
         }),
       });
 
-      if (res.status === 422) {
-        setError('That email is already registered.');
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'That email or username is already taken.');
         return;
       }
 
-      navigate('/verify-email', { state: { email } });
+      navigate('/login');
     } catch {
       setError('Something went wrong. Try again.');
     }

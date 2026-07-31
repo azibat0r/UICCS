@@ -2,10 +2,8 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const PendingSignup = require('../models/PendingSignup');
 const Group = require('../models/Group');
 const { verifyLeetCodeUsername, verifyGithubRepo } = require('../services/submissionCheck');
-const { sendVerificationCode } = require('../services/email');
 
 const router = express.Router();
 
@@ -18,15 +16,11 @@ const COOKIE_OPTIONS = {
   sameSite: 'none',
 };
 
-function generateCode() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-// Nothing is created in the real Users collection here - only a
-// temporary PendingSignup record, until the code is verified.
+// TEMP: email verification is bypassed for launch - account is created
+// immediately and marked verified, instead of going through PendingSignup.
+// Re-enable the PendingSignup flow once a verified sending domain is set up.
 router.post('/register', async (req, res) => {
   const { name, email, password, linkedinUrl, githubUrl, personalWebsite, companies } = req.body;
-
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -38,92 +32,21 @@ router.post('/register', async (req, res) => {
       return res.status(422).json({ error: 'That username is already taken.' });
     }
 
-    const verificationCode = generateCode();
-    const verificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000);
+    const userDoc = await User.create({
+      name,
+      email,
+      password: bcrypt.hashSync(password, bcryptSalt),
+      linkedinUrl,
+      githubUrl,
+      personalWebsite,
+      companies,
+      emailVerified: true, // TEMP - bypassed for launch
+    });
 
-    await PendingSignup.findOneAndUpdate(
-      { email },
-      {
-        name,
-        email,
-        password: bcrypt.hashSync(password, bcryptSalt),
-        linkedinUrl,
-        githubUrl,
-        personalWebsite,
-        companies,
-        verificationCode,
-        verificationCodeExpires,
-        createdAt: new Date(),
-      },
-      { upsert: true }
-    );
-
-    await sendVerificationCode(email, verificationCode);
-
-    res.json({ pending: true, email });
+    res.json(userDoc);
   } catch (e) {
     res.status(422).json(e);
   }
-});
-
-// The real account only gets created here, once the code checks out.
-router.post('/verify-email-code', async (req, res) => {
-  const { email, code } = req.body;
-  if (!email || !code) {
-    return res.status(400).json({ error: 'Email and code are required.' });
-  }
-
-  const pending = await PendingSignup.findOne({
-    email,
-    verificationCode: code,
-    verificationCodeExpires: { $gt: new Date() },
-  });
-
-  if (!pending) {
-    return res.status(400).json({
-      error: 'That code is invalid or has expired. Please sign up again.',
-    });
-  }
-
-  try {
-    const userDoc = await User.create({
-      name: pending.name,
-      email: pending.email,
-      password: pending.password,
-      linkedinUrl: pending.linkedinUrl,
-      githubUrl: pending.githubUrl,
-      personalWebsite: pending.personalWebsite,
-      companies: pending.companies,
-      emailVerified: true,
-    });
-
-    await PendingSignup.deleteOne({ _id: pending._id });
-
-    res.json({ verified: true, userId: userDoc._id });
-  } catch (e) {
-    res.status(422).json({ error: 'That email or username was just taken. Please sign up again.' });
-  }
-});
-
-router.post('/resend-verification-code', async (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ error: 'Email is required.' });
-
-  const pending = await PendingSignup.findOne({ email });
-
-  if (!pending) {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.json({ alreadyVerified: true });
-    return res.status(404).json({ error: 'No pending signup found for that email. Please sign up again.' });
-  }
-
-  pending.verificationCode = generateCode();
-  pending.verificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000);
-  await pending.save();
-
-  await sendVerificationCode(email, pending.verificationCode);
-
-  res.json({ sent: true });
 });
 
 router.post('/login', async (req, res) => {
@@ -307,6 +230,25 @@ router.post('/change-username', async (req, res) => {
   });
 });
 
+router.post('/update-profile-details', async (req, res) => {
+  const { token } = req.cookies;
+  if (!token) return res.status(401).json({ error: 'Not logged in' });
+
+  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    if (err) return res.status(401).json({ error: 'Not logged in' });
+
+    const { linkedinUrl, githubUrl, personalWebsite, companies } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      userData.id,
+      { linkedinUrl, githubUrl, personalWebsite, companies },
+      { returnDocument: 'after' }
+    );
+
+    res.json(pickUserFields(user));
+  });
+});
+
 router.delete('/delete-account', async (req, res) => {
   const { token } = req.cookies;
   if (!token) return res.status(401).json({ error: 'Not logged in' });
@@ -341,25 +283,5 @@ function pickUserFields(user) {
     companies: user.companies,
   };
 }
-
-router.post('/update-profile-details', async (req, res) => {
-  const { token } = req.cookies;
-  if (!token) return res.status(401).json({ error: 'Not logged in' });
-
-  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-    if (err) return res.status(401).json({ error: 'Not logged in' });
-
-    const { linkedinUrl, githubUrl, personalWebsite, companies } = req.body;
-
-    const user = await User.findByIdAndUpdate(
-      userData.id,
-      { linkedinUrl, githubUrl, personalWebsite, companies },
-      { returnDocument: 'after' }
-    );
-
-    res.json(pickUserFields(user));
-  });
-});
-
 
 module.exports = router;

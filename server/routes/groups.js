@@ -1,7 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const Group = require('../models/Group');
-const User = require('../models/User');
 
 const router = express.Router();
 const jwtSecret = process.env.JWT_SECRET;
@@ -41,12 +40,6 @@ router.get('/mine', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const userId = await getUserIdFromReq(req);
-
-    const requester = await User.findById(userId);
-    if (!requester?.emailVerified) {
-      return res.status(403).json({ error: 'Please verify your email before creating a study group.' });
-    }
-
     const { focus, description, format, frequency, askToJoin, memberCap } = req.body;
 
     const group = await Group.create({
@@ -69,12 +62,6 @@ router.post('/', async (req, res) => {
 router.post('/:id/join', async (req, res) => {
   try {
     const userId = await getUserIdFromReq(req);
-
-    const requester = await User.findById(userId);
-    if (!requester?.emailVerified) {
-      return res.status(403).json({ error: 'Please verify your email before joining a study group.' });
-    }
-
     const group = await Group.findById(req.params.id);
 
     if (!group) return res.status(404).json({ error: 'Group not found' });
