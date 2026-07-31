@@ -40,7 +40,7 @@ connectDB().then(() => {
   syncInternships();
   checkAllSubmissions();
 
-  cron.schedule('0 */6 * * *', () => {
+  cron.schedule('0 * * * *', () => {
     console.log('[cron] Running scheduled internship sync...');
     syncInternships();
   });
