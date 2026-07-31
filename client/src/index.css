@@ -3,8 +3,34 @@
 @theme {
   --color-bg: #0a0a0d;
   --color-surface: #131318;
+  --color-surface-hover: #191a20;
   --color-border: #232329;
   --color-text: #edebe6;
   --color-text-muted: #8a8892;
   --color-accent: #c1443b;
+  --color-accent-soft: rgba(193, 68, 59, 0.12);
+  --color-accent-border: rgba(193, 68, 59, 0.4);
+
+  --font-display: 'Fraunces', serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }
