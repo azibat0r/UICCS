@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useUser } from '../context/useUser.js';
 import { API_URL } from '../config.js';
 
 export default function VerifyEmail() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { setUser } = useUser();
   const emailFromSignup = location.state?.email || '';
 
   const [email, setEmail] = useState(emailFromSignup);
@@ -22,6 +24,7 @@ export default function VerifyEmail() {
       const res = await fetch(`${API_URL}/api/auth/verify-email-code`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, code }),
       });
       const data = await res.json();
@@ -32,7 +35,8 @@ export default function VerifyEmail() {
         return;
       }
 
-      navigate('/login');
+      setUser(data);
+      navigate('/');
     } catch {
       setSubmitting(false);
       setError('Something went wrong. Try again.');

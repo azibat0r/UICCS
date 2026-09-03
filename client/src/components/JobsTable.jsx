@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { API_URL } from '../config.js';
+import { useState } from 'react';
 
 function formatDate(dateStr) {
   if (!dateStr) return '-';
@@ -7,23 +6,12 @@ function formatDate(dateStr) {
   return d.toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
 }
 
-export default function JobsTable() {
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export default function JobsTable({ jobs }) {
   const [search, setSearch] = useState('');
   const [appliedIds, setAppliedIds] = useState(() => {
     const saved = localStorage.getItem('appliedJobs');
     return saved ? JSON.parse(saved) : {};
   });
-
-  useEffect(() => {
-    fetch(`${API_URL}/api/jobs`)
-      .then((res) => res.json())
-      .then((data) => setJobs(data))
-      .catch(() => setError('Could not load internships.'))
-      .finally(() => setLoading(false));
-  }, []);
 
   function toggleApplied(jobId) {
     setAppliedIds((prev) => {
@@ -41,9 +29,6 @@ export default function JobsTable() {
       job.locations?.some((loc) => loc.toLowerCase().includes(term))
     );
   });
-
-  if (loading) return <p className="text-(--color-text-muted)">Loading roles...</p>;
-  if (error) return <p className="text-(--color-accent)">{error}</p>;
 
   return (
     <div>

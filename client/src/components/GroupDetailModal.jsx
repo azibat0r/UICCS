@@ -1,12 +1,21 @@
+import { motion } from 'framer-motion';
+
 export default function GroupDetailModal({ group, onClose, onLeave, onViewActivity }) {
   if (!group) return null;
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-6"
       onClick={onClose}
     >
-      <div
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.2 }}
         className="bg-(--color-surface) border border-(--color-border) rounded-xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
@@ -66,7 +75,7 @@ export default function GroupDetailModal({ group, onClose, onLeave, onViewActivi
         >
           Leave Group
         </button>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

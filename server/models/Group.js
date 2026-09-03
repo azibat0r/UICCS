@@ -14,6 +14,7 @@ const GroupSchema = new Schema(
       {
         user: { type: Schema.Types.ObjectId, ref: 'User' },
         joinedAt: { type: Date, default: Date.now },
+        lastReminderSentAt: Date,
       },
     ],
   },

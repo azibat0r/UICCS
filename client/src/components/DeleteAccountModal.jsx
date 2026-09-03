@@ -1,14 +1,22 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 
 export default function DeleteAccountModal({ onConfirm, onCancel }) {
   const [confirming, setConfirming] = useState(false);
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-6"
       onClick={onCancel}
     >
-      <div
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.2 }}
         className="bg-(--color-surface) border border-(--color-border) rounded-xl p-6 max-w-sm w-full"
         onClick={(e) => e.stopPropagation()}
       >
@@ -36,7 +44,7 @@ export default function DeleteAccountModal({ onConfirm, onCancel }) {
             {confirming ? 'Deleting...' : 'Delete Permanently'}
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

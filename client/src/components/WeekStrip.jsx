@@ -29,7 +29,7 @@ export default function WeekStrip({ submissions, onOpenTimeline }) {
     <div>
       <button
         onClick={onOpenTimeline}
-        className="text-xs text-(--color-text-muted) hover:text-(--color-accent) transition mb-2"
+        className="block mx-auto text-xs text-(--color-text-muted) hover:text-(--color-accent) transition mb-2"
       >
         Timeline
       </button>

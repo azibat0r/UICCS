@@ -32,13 +32,13 @@ export default function Navbar() {
       <Link
         to="/profile"
         onClick={() => setMenuOpen(false)}
-        className="rounded-md border border-(--color-border) px-3 py-1.5 text-center hover:border-(--color-accent) transition"
+        className="rounded-full border border-(--color-border) px-3 py-1.5 text-center hover:border-(--color-accent) transition"
       >
         {user.name}
       </Link>
       <button
         onClick={handleLogout}
-        className="rounded-md border border-(--color-border) px-3 py-1.5 hover:border-(--color-accent) transition"
+        className="rounded-full border border-(--color-border) px-3 py-1.5 hover:border-(--color-accent) transition"
       >
         Log Out
       </button>

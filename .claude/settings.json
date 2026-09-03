@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npx shadcn@latest init --help)",
+      "Bash(npx shadcn@latest add --help)",
+      "Bash(npx shadcn@latest init -t vite -b aria -y)"
+    ]
+  }
+}

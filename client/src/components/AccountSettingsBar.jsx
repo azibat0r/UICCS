@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { useUser } from '../context/useUser.js';
 import LinkAccountModal from './LinkAccountModal.jsx';
 import { API_URL } from '../config.js';
@@ -81,13 +82,15 @@ export default function AccountSettingsBar() {
         </div>
       </div>
 
-      {linkingPlatform && (
-        <LinkAccountModal
-          platform={linkingPlatform}
-          onSaved={handleSaved}
-          onCancel={() => setLinkingPlatform(null)}
-        />
-      )}
+      <AnimatePresence>
+        {linkingPlatform && (
+          <LinkAccountModal
+            platform={linkingPlatform}
+            onSaved={handleSaved}
+            onCancel={() => setLinkingPlatform(null)}
+          />
+        )}
+      </AnimatePresence>
 
       {unlinkChoice && (
         <div

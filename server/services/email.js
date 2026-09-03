@@ -2,10 +2,12 @@ const { Resend } = require('resend');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const FROM_ADDRESS = 'PathToSWE <noreply@pathtoswe.me>';
+
 async function sendVerificationCode(to, code) {
   try {
     await resend.emails.send({
-      from: 'PathToSWE <onboarding@resend.dev>',
+      from: FROM_ADDRESS,
       to,
       subject: 'Your PathToSWE verification code',
       html: `
@@ -28,4 +30,30 @@ async function sendVerificationCode(to, code) {
   }
 }
 
-module.exports = { sendVerificationCode };
+async function sendReminderEmail(to, groupFocus, frequency) {
+  try {
+    await resend.emails.send({
+      from: FROM_ADDRESS,
+      to,
+      subject: `Time to practice - ${groupFocus}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+          <h2>Time to practice</h2>
+          <p>
+            Your group <strong>${groupFocus}</strong> is on a <strong>${frequency}</strong>
+            schedule, and it's been a while since your last verified submission.
+          </p>
+          <p style="color:#888; font-size:12px;">
+            Solve a problem on LeetCode or NeetCode to stay on track with your group.
+          </p>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.error('[email] Failed to send reminder email:', err.message);
+    return false;
+  }
+}
+
+module.exports = { sendVerificationCode, sendReminderEmail };

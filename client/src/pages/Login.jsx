@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useUser } from '../context/useUser.js';
+import FadeInSection from '../components/FadeInSection.jsx';
 import { API_URL } from '../config.js';
 
 export default function Login() {
@@ -35,39 +37,46 @@ export default function Login() {
   }
 
   return (
-    <div className="mx-auto max-w-sm px-6 py-16">
-      <h1 className="text-3xl font-bold mb-6">Login</h1>
-      <form onSubmit={handleLogin} className="flex flex-col gap-4">
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="rounded-md border border-(--color-border) bg-(--color-surface) px-4 py-2 text-sm"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="rounded-md border border-(--color-border) bg-(--color-surface) px-4 py-2 text-sm"
-          required
-        />
-        {error && <p className="text-(--color-accent) text-sm">{error}</p>}
-        <button
-          type="submit"
-          className="rounded-md bg-(--color-accent) px-4 py-2 text-sm font-medium text-(--color-bg) hover:opacity-90 transition"
-        >
-          Log In
-        </button>
-      </form>
-      <p className="mt-4 text-sm text-(--color-text-muted)">
-        Don't have an account?{' '}
-        <Link to="/signup" className="text-(--color-accent) hover:underline">
-          Sign up
-        </Link>
-      </p>
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      className="mx-auto max-w-sm px-6 pt-16 sm:pt-24 pb-16"
+    >
+      <FadeInSection>
+        <h1 className="text-3xl font-bold mb-6">Login</h1>
+        <form onSubmit={handleLogin} className="flex flex-col gap-4">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="rounded-md border border-(--color-border) bg-(--color-surface) px-4 py-2 text-sm"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="rounded-md border border-(--color-border) bg-(--color-surface) px-4 py-2 text-sm"
+            required
+          />
+          {error && <p className="text-(--color-accent) text-sm">{error}</p>}
+          <button
+            type="submit"
+            className="rounded-md bg-(--color-accent) px-4 py-2 text-sm font-medium text-(--color-bg) hover:opacity-90 transition"
+          >
+            Log In
+          </button>
+        </form>
+        <p className="mt-4 text-sm text-(--color-text-muted)">
+          Don't have an account?{' '}
+          <Link to="/signup" className="text-(--color-accent) hover:underline">
+            Sign up
+          </Link>
+        </p>
+      </FadeInSection>
+    </motion.div>
   );
 }

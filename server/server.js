@@ -7,6 +7,7 @@ const connectDB = require('./config/db');
 const jobsRouter = require('./routes/jobs');
 const { syncInternships } = require('./services/githubSync');
 const { checkAllSubmissions } = require('./services/submissionCheck');
+const { checkReminders } = require('./services/reminders');
 
 const app = express();
 
@@ -48,5 +49,10 @@ connectDB().then(() => {
   cron.schedule('*/5 * * * *', () => {
     console.log('[cron] Running scheduled submission check...');
     checkAllSubmissions();
+  });
+
+  cron.schedule('*/30 * * * *', () => {
+    console.log('[cron] Running scheduled reminder check...');
+    checkReminders();
   });
 });

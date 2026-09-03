@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '../context/useUser.js';
 import GroupCard from '../components/GroupCard.jsx';
 import CreateGroupForm from '../components/CreateGroupForm.jsx';
@@ -6,6 +7,7 @@ import LinkAccountModal from '../components/LinkAccountModal.jsx';
 import GroupDetailModal from '../components/GroupDetailModal.jsx';
 import GroupActivityModal from '../components/GroupActivityModal.jsx';
 import AccountSettingsBar from '../components/AccountSettingsBar.jsx';
+import FadeInSection from '../components/FadeInSection.jsx';
 import { API_URL } from '../config.js';
 
 export default function StudyGroups() {
@@ -74,10 +76,17 @@ export default function StudyGroups() {
   const myGroupIds = new Set(myGroups.map((g) => g._id));
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-12 py-10 sm:py-16">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      className="w-full px-4 sm:px-6 lg:px-12 pt-16 sm:pt-24 pb-10 sm:pb-16"
+    >
       <h1 className="text-3xl font-bold mb-6">Study Groups</h1>
 
-      <AccountSettingsBar />
+      <FadeInSection>
+        <AccountSettingsBar />
+      </FadeInSection>
 
       <div className="flex gap-2 mb-8 border-b border-(--color-border)">
         {['mine', 'browse', 'create'].map((t) => (
@@ -102,18 +111,18 @@ export default function StudyGroups() {
       )}
 
       {tab === 'mine' && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <FadeInSection className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {myGroups.length === 0 && !loading && (
             <p className="text-(--color-text-muted)">You haven't joined any groups yet.</p>
           )}
           {myGroups.map((group) => (
             <GroupCard key={group._id} group={group} isMember onOpen={setOpenGroup} />
           ))}
-        </div>
+        </FadeInSection>
       )}
 
       {tab === 'browse' && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <FadeInSection className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {allGroups.map((group) => (
             <GroupCard
               key={group._id}
@@ -123,43 +132,51 @@ export default function StudyGroups() {
               isMember={myGroupIds.has(group._id)}
             />
           ))}
-        </div>
+        </FadeInSection>
       )}
 
       {tab === 'create' &&
         (user ? (
-          <CreateGroupForm
-            onCreated={() => {
-              loadGroups();
-              setTab('mine');
-            }}
-          />
+          <FadeInSection>
+            <CreateGroupForm
+              onCreated={() => {
+                loadGroups();
+                setTab('mine');
+              }}
+            />
+          </FadeInSection>
         ) : (
           <p className="text-(--color-text-muted)">Log in to create a group.</p>
         ))}
 
-      {pendingGroupId && (
-        <LinkAccountModal
-          onSaved={handleLinkAccountSaved}
-          onCancel={() => setPendingGroupId(null)}
-        />
-      )}
+      <AnimatePresence>
+        {pendingGroupId && (
+          <LinkAccountModal
+            onSaved={handleLinkAccountSaved}
+            onCancel={() => setPendingGroupId(null)}
+          />
+        )}
+      </AnimatePresence>
 
-      {openGroup && (
-        <GroupDetailModal
-          group={openGroup}
-          onClose={() => setOpenGroup(null)}
-          onLeave={handleLeave}
-          onViewActivity={() => {
-            setActivityGroup(openGroup);
-            setOpenGroup(null);
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {openGroup && (
+          <GroupDetailModal
+            group={openGroup}
+            onClose={() => setOpenGroup(null)}
+            onLeave={handleLeave}
+            onViewActivity={() => {
+              setActivityGroup(openGroup);
+              setOpenGroup(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
 
-      {activityGroup && (
-        <GroupActivityModal group={activityGroup} onClose={() => setActivityGroup(null)} />
-      )}
-    </div>
+      <AnimatePresence>
+        {activityGroup && (
+          <GroupActivityModal group={activityGroup} onClose={() => setActivityGroup(null)} />
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

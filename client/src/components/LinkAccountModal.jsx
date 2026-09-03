@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { API_URL } from '../config.js';
 
 export default function LinkAccountModal({ platform, onSaved, onCancel }) {
@@ -42,8 +43,19 @@ export default function LinkAccountModal({ platform, onSaved, onCancel }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-6">
-      <div className="bg-(--color-surface) border border-(--color-border) rounded-xl p-6 max-w-md w-full">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-6"
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.2 }}
+        className="bg-(--color-surface) border border-(--color-border) rounded-xl p-6 max-w-md w-full"
+      >
         <h2 className="text-xl font-bold mb-2">
           Link your {platform === 'leetcode' ? 'LeetCode' : 'NeetCode'} account
         </h2>
@@ -80,7 +92,7 @@ export default function LinkAccountModal({ platform, onSaved, onCancel }) {
             {saving ? 'Checking...' : 'Save'}
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

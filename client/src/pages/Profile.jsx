@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '../context/useUser.js';
 import AccountSettingsBar from '../components/AccountSettingsBar.jsx';
 import DeleteAccountModal from '../components/DeleteAccountModal.jsx';
 import ProfileDetailsForm from '../components/ProfileDetailsForm.jsx';
+import FadeInSection from '../components/FadeInSection.jsx';
 import { API_URL } from '../config.js';
 
 export default function Profile() {
@@ -17,9 +19,16 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div className="w-full px-6 lg:px-12 py-16">
-        <p className="text-(--color-text-muted)">Log in to view your profile.</p>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+        className="w-full px-6 lg:px-12 pt-16 sm:pt-24 pb-16"
+      >
+        <FadeInSection>
+          <p className="text-(--color-text-muted)">Log in to view your profile.</p>
+        </FadeInSection>
+      </motion.div>
     );
   }
 
@@ -55,10 +64,15 @@ export default function Profile() {
   }
 
   return (
-    <div className="w-full px-6 lg:px-12 py-16 max-w-2xl">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      className="w-full px-6 lg:px-12 pt-16 sm:pt-24 pb-16 max-w-2xl"
+    >
       <h1 className="text-3xl font-bold mb-8">Profile</h1>
 
-      <div className="mb-8">
+      <FadeInSection className="mb-8">
         <label className="text-sm text-(--color-text-muted)">Username</label>
         <div className="mt-2 flex gap-2">
           <input
@@ -76,19 +90,19 @@ export default function Profile() {
           </button>
         </div>
         {nameError && <p className="text-(--color-accent) text-sm mt-2">{nameError}</p>}
-      </div>
+      </FadeInSection>
 
-      <div className="mb-8">
+      <FadeInSection className="mb-8">
         <p className="text-sm text-(--color-text-muted) mb-2">Career details</p>
         <ProfileDetailsForm />
-      </div>
+      </FadeInSection>
 
-      <div className="mb-8">
+      <FadeInSection className="mb-8">
         <p className="text-sm text-(--color-text-muted) mb-2">Practice accounts</p>
         <AccountSettingsBar />
-      </div>
+      </FadeInSection>
 
-      <div className="border-t border-(--color-border) pt-6">
+      <FadeInSection className="border-t border-(--color-border) pt-6">
         <p className="text-sm text-(--color-text-muted) mb-3">Danger zone</p>
         <button
           onClick={() => setShowDeleteModal(true)}
@@ -96,14 +110,16 @@ export default function Profile() {
         >
           Delete Account
         </button>
-      </div>
+      </FadeInSection>
 
-      {showDeleteModal && (
-        <DeleteAccountModal
-          onConfirm={handleDeleteAccount}
-          onCancel={() => setShowDeleteModal(false)}
-        />
-      )}
-    </div>
+      <AnimatePresence>
+        {showDeleteModal && (
+          <DeleteAccountModal
+            onConfirm={handleDeleteAccount}
+            onCancel={() => setShowDeleteModal(false)}
+          />
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

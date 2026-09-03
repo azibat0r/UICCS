@@ -3,7 +3,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Group = require('../models/Group');
+const PendingSignup = require('../models/PendingSignup');
 const { verifyLeetCodeUsername, verifyGithubRepo } = require('../services/submissionCheck');
+const { sendVerificationCode } = require('../services/email');
 
 const router = express.Router();
 
@@ -16,9 +18,12 @@ const COOKIE_OPTIONS = {
   sameSite: 'none',
 };
 
-// TEMP: email verification is bypassed for launch - account is created
-// immediately and marked verified, instead of going through PendingSignup.
-// Re-enable the PendingSignup flow once a verified sending domain is set up.
+const VERIFICATION_CODE_TTL_MS = 15 * 60 * 1000;
+
+function generateVerificationCode() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
 router.post('/register', async (req, res) => {
   const { name, email, password, linkedinUrl, githubUrl, personalWebsite, companies } = req.body;
   try {
@@ -32,20 +37,90 @@ router.post('/register', async (req, res) => {
       return res.status(422).json({ error: 'That username is already taken.' });
     }
 
-    const userDoc = await User.create({
-      name,
-      email,
-      password: bcrypt.hashSync(password, bcryptSalt),
-      linkedinUrl,
-      githubUrl,
-      personalWebsite,
-      companies,
-      emailVerified: true, // TEMP - bypassed for launch
-    });
+    const code = generateVerificationCode();
 
-    res.json(userDoc);
+    await PendingSignup.findOneAndUpdate(
+      { email },
+      {
+        name,
+        email,
+        password: bcrypt.hashSync(password, bcryptSalt),
+        linkedinUrl,
+        githubUrl,
+        personalWebsite,
+        companies,
+        verificationCode: code,
+        verificationCodeExpires: new Date(Date.now() + VERIFICATION_CODE_TTL_MS),
+        createdAt: new Date(),
+      },
+      { upsert: true }
+    );
+
+    await sendVerificationCode(email, code);
+
+    res.json({ pending: true, email });
   } catch (e) {
     res.status(422).json(e);
+  }
+});
+
+router.post('/verify-email-code', async (req, res) => {
+  const { email, code } = req.body;
+
+  try {
+    const pending = await PendingSignup.findOne({ email });
+
+    if (!pending || pending.verificationCode !== code || pending.verificationCodeExpires < new Date()) {
+      return res.status(422).json({ error: 'Invalid or expired code.' });
+    }
+
+    const userDoc = await User.create({
+      name: pending.name,
+      email: pending.email,
+      password: pending.password,
+      linkedinUrl: pending.linkedinUrl,
+      githubUrl: pending.githubUrl,
+      personalWebsite: pending.personalWebsite,
+      companies: pending.companies,
+      emailVerified: true,
+    });
+
+    await PendingSignup.deleteOne({ _id: pending._id });
+
+    jwt.sign({ email: userDoc.email, id: userDoc._id }, jwtSecret, {}, (err, token) => {
+      if (err) {
+        return res.status(500).json({ error: 'Verification succeeded, but login failed. Try logging in.' });
+      }
+      res.cookie('token', token, COOKIE_OPTIONS).json(pickUserFields(userDoc));
+    });
+  } catch {
+    res.status(422).json({ error: 'Something went wrong. Try again.' });
+  }
+});
+
+router.post('/resend-verification-code', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const pending = await PendingSignup.findOne({ email });
+
+    if (!pending) {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.json({ alreadyVerified: true });
+      }
+      return res.status(404).json({ error: 'No pending signup found for that email.' });
+    }
+
+    pending.verificationCode = generateVerificationCode();
+    pending.verificationCodeExpires = new Date(Date.now() + VERIFICATION_CODE_TTL_MS);
+    await pending.save();
+
+    await sendVerificationCode(email, pending.verificationCode);
+
+    res.json({ sent: true });
+  } catch {
+    res.status(422).json({ error: 'Something went wrong. Try again.' });
   }
 });
 

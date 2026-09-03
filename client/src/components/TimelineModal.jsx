@@ -1,69 +1,45 @@
-import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Calendar } from '@/components/ui/calendar';
 
-function sameDay(a, b) {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
+function isSubmittedDay(calendarDate, submissions) {
+  return submissions.some((s) => {
+    const d = new Date(s.timestamp);
+    return (
+      d.getFullYear() === calendarDate.year &&
+      d.getMonth() + 1 === calendarDate.month &&
+      d.getDate() === calendarDate.day
+    );
+  });
 }
 
 export default function TimelineModal({ submissions, onClose }) {
-  const [viewDate, setViewDate] = useState(new Date());
-
-  const year = viewDate.getFullYear();
-  const month = viewDate.getMonth();
-  const firstOfMonth = new Date(year, month, 1);
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const startWeekday = firstOfMonth.getDay();
-
-  const cells = [];
-  for (let i = 0; i < startWeekday; i++) cells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-
-  function changeMonth(delta) {
-    setViewDate(new Date(year, month + delta, 1));
-  }
-
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] px-6"
       onClick={onClose}
     >
-      <div
-        className="bg-(--color-surface) border border-(--color-border) rounded-xl p-6 max-w-sm w-full"
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.2 }}
+        className="bg-(--color-surface) border border-(--color-border) rounded-xl p-6 w-[75vh] h-[75vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between mb-4">
-          <button onClick={() => changeMonth(-1)} className="text-(--color-text-muted) hover:text-(--color-text)">‹</button>
-          <h3 className="font-bold">
-            {viewDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}
-          </h3>
-          <button onClick={() => changeMonth(1)} className="text-(--color-text-muted) hover:text-(--color-text)">›</button>
-        </div>
-
-        <div className="grid grid-cols-7 gap-1 text-xs text-center text-(--color-text-muted) mb-2">
-          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
-            <span key={i}>{d}</span>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-7 gap-1">
-          {cells.map((day, i) => {
-            if (day === null) return <div key={i} />;
-            const cellDate = new Date(year, month, day);
-            const submitted = submissions.some((s) => sameDay(new Date(s.timestamp), cellDate));
-            return (
-              <div
-                key={i}
-                className={`aspect-square flex items-center justify-center rounded-full text-xs ${
-                  submitted ? 'bg-green-500 text-(--color-bg)' : 'text-(--color-text-muted)'
-                }`}
-              >
-                {day}
-              </div>
-            );
-          })}
+        <div className="flex-1 flex items-center justify-center">
+          <Calendar
+            isReadOnly
+            aria-label="Submission history"
+            dayClassName={(date) =>
+              isSubmittedDay(date, submissions)
+                ? 'border-2 border-green-500 text-green-400'
+                : ''
+            }
+            className="bg-transparent [--cell-size:--spacing(16)]"
+          />
         </div>
 
         <button
@@ -72,7 +48,7 @@ export default function TimelineModal({ submissions, onClose }) {
         >
           Close
         </button>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
