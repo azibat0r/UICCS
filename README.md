@@ -21,6 +21,10 @@ honor system.
 - **Activity feed & streaks** — a chat-style feed of every group member's
   verified submissions, a weekly streak strip, and a full monthly calendar
   view, all scoped to activity since each member joined
+- **Reminder emails** — a scheduled check (every 30 minutes) flags any group
+  member overdue on their group's Daily/Weekly/Biweekly cadence and emails
+  them a nudge, with a cooldown so no one gets reminded more than once per
+  window
 - **Full authentication** — email/password with bcrypt-hashed passwords and
   JWT sessions via httpOnly cookies; duplicate-account protection so two
   people can't track the same LeetCode/GitHub account
