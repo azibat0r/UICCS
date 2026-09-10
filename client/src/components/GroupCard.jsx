@@ -8,7 +8,7 @@ export default function GroupCard({ group, onJoin, onOpen, isMember }) {
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-bold text-lg">{group.focus}</h3>
+          <h3 className="font-bold text-lg">{group.title}</h3>
           <p className="text-xs text-(--color-text-muted) mt-1">
             Created by {group.createdBy?.name || 'Unknown'}
           </p>
@@ -23,9 +23,10 @@ export default function GroupCard({ group, onJoin, onOpen, isMember }) {
       )}
 
       <div className="mt-4 flex items-center gap-3 text-xs text-(--color-text-muted)">
-        <span>{group.format}</span>
-        <span>·</span>
-        <span>{group.frequency}</span>
+        <span>
+          {group.questionsPerDay} question{group.questionsPerDay === 1 ? '' : 's'} ·{' '}
+          {group.daysPerWeek}x/week
+        </span>
         <span>·</span>
         <span>{group.askToJoin ? 'Approval required' : 'Open to join'}</span>
       </div>

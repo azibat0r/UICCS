@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/Navbar.jsx';
 import SurveyBanner from './components/SurveyBanner.jsx';
+import JoinRequestPopup from './components/JoinRequestPopup.jsx';
 import Home from './pages/Home.jsx';
 import InternshipFeed from './pages/InternshipFeed.jsx';
 import Login from './pages/Login.jsx';
@@ -17,6 +18,7 @@ function App() {
     <div className="min-h-screen bg-(--color-bg) text-(--color-text) overflow-x-hidden">
       <Navbar />
       <SurveyBanner />
+      <JoinRequestPopup />
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={location.pathname}

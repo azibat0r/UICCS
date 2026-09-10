@@ -21,7 +21,7 @@ export default function GroupDetailModal({ group, onClose, onLeave, onViewActivi
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-2xl font-bold">{group.focus}</h2>
+            <h2 className="text-2xl font-bold">{group.title}</h2>
             <p className="text-xs text-(--color-text-muted) mt-1">
               Created by {group.createdBy?.name || 'Unknown'}
             </p>
@@ -39,9 +39,10 @@ export default function GroupDetailModal({ group, onClose, onLeave, onViewActivi
         )}
 
         <div className="mt-4 flex items-center gap-3 text-xs text-(--color-text-muted)">
-          <span>{group.format}</span>
-          <span>·</span>
-          <span>{group.frequency}</span>
+          <span>
+            {group.questionsPerDay} question{group.questionsPerDay === 1 ? '' : 's'} ·{' '}
+            {group.daysPerWeek}x/week
+          </span>
           <span>·</span>
           <span>{group.askToJoin ? 'Approval required' : 'Open to join'}</span>
           <span>·</span>

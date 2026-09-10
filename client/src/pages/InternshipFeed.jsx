@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import JobsTable from '../components/JobsTable.jsx';
+import SyncBadge from '../components/SyncBadge.jsx';
 import { API_URL } from '../config.js';
 
 export default function InternshipFeed() {
@@ -23,7 +24,9 @@ export default function InternshipFeed() {
       transition={{ duration: 0.35, ease: 'easeOut' }}
       className="w-full px-4 sm:px-6 lg:px-12 pt-16 sm:pt-24 pb-10 sm:pb-16"
     >
-      <h1 className="text-3xl font-bold mb-6">Internship Feed</h1>
+      <div className="mb-6">
+        <SyncBadge />
+      </div>
       {error ? (
         <p className="text-(--color-accent)">{error}</p>
       ) : (

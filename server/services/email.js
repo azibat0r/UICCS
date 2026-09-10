@@ -30,18 +30,20 @@ async function sendVerificationCode(to, code) {
   }
 }
 
-async function sendReminderEmail(to, groupFocus, frequency) {
+async function sendReminderEmail(to, groupTitle, daysPerWeek, questionsPerDay) {
   try {
+    const schedule = `${questionsPerDay} question${questionsPerDay === 1 ? '' : 's'} on ${daysPerWeek} day${daysPerWeek === 1 ? '' : 's'} a week`;
+
     await resend.emails.send({
       from: FROM_ADDRESS,
       to,
-      subject: `Time to practice - ${groupFocus}`,
+      subject: `Time to practice - ${groupTitle}`,
       html: `
         <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
           <h2>Time to practice</h2>
           <p>
-            Your group <strong>${groupFocus}</strong> is on a <strong>${frequency}</strong>
-            schedule, and it's been a while since your last verified submission.
+            Your group <strong>${groupTitle}</strong> aims for <strong>${schedule}</strong>,
+            and it's been a while since your last verified submission.
           </p>
           <p style="color:#888; font-size:12px;">
             Solve a problem on LeetCode or NeetCode to stay on track with your group.
@@ -56,4 +58,30 @@ async function sendReminderEmail(to, groupFocus, frequency) {
   }
 }
 
-module.exports = { sendVerificationCode, sendReminderEmail };
+async function sendJoinRequestEmail(to, groupTitle, requesterName) {
+  try {
+    await resend.emails.send({
+      from: FROM_ADDRESS,
+      to,
+      subject: `${requesterName} wants to join ${groupTitle}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+          <h2>New join request</h2>
+          <p>
+            <strong>${requesterName}</strong> wants to join your study group
+            <strong>${groupTitle}</strong>.
+          </p>
+          <p style="color:#888; font-size:12px;">
+            Open PathToSWE to accept or deny this request.
+          </p>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.error('[email] Failed to send join request email:', err.message);
+    return false;
+  }
+}
+
+module.exports = { sendVerificationCode, sendReminderEmail, sendJoinRequestEmail };

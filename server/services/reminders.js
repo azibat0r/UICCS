@@ -6,52 +6,54 @@ const Submission = require('../models/Submission');
 require('../models/User');
 const { sendReminderEmail } = require('./email');
 
-const THRESHOLD_HOURS = {
-  Daily: 24,
-  Weekly: 24 * 7,
-  Biweekly: 24 * 14,
-};
+const HOURS_PER_WEEK = 24 * 7;
 
 function hoursSince(date) {
   return (Date.now() - date.getTime()) / (1000 * 60 * 60);
 }
 
-// Runs through every group, by frequency, and emails any member who hasn't
-// had a verified submission since they joined within their group's window -
-// skipping anyone already reminded within that same window.
+// Runs through every group and emails any member who hasn't had a verified
+// submission since they joined within their group's schedule window
+// (a week's worth of hours spread evenly across daysPerWeek) - skipping
+// anyone already reminded within that same window.
 async function checkReminders() {
   let sentCount = 0;
 
-  for (const [frequency, thresholdHours] of Object.entries(THRESHOLD_HOURS)) {
-    const groups = await Group.find({ frequency }).populate({
-      path: 'members.user',
-      select: 'email',
-    });
+  const groups = await Group.find().populate({
+    path: 'members.user',
+    select: 'email',
+  });
 
-    for (const group of groups) {
-      for (const member of group.members) {
-        const user = member.user;
-        if (!user?.email) continue;
+  for (const group of groups) {
+    const thresholdHours = HOURS_PER_WEEK / group.daysPerWeek;
 
-        const lastSubmission = await Submission.findOne({
-          user: user._id,
-          timestamp: { $gte: member.joinedAt },
-        }).sort({ timestamp: -1 });
+    for (const member of group.members) {
+      const user = member.user;
+      if (!user?.email) continue;
 
-        const lastActivityAt = lastSubmission ? lastSubmission.timestamp : member.joinedAt;
+      const lastSubmission = await Submission.findOne({
+        user: user._id,
+        timestamp: { $gte: member.joinedAt },
+      }).sort({ timestamp: -1 });
 
-        if (hoursSince(lastActivityAt) < thresholdHours) continue;
+      const lastActivityAt = lastSubmission ? lastSubmission.timestamp : member.joinedAt;
 
-        if (member.lastReminderSentAt && hoursSince(member.lastReminderSentAt) < thresholdHours) {
-          continue;
-        }
+      if (hoursSince(lastActivityAt) < thresholdHours) continue;
 
-        const sent = await sendReminderEmail(user.email, group.focus, frequency);
-        if (sent) {
-          member.lastReminderSentAt = new Date();
-          await group.save();
-          sentCount += 1;
-        }
+      if (member.lastReminderSentAt && hoursSince(member.lastReminderSentAt) < thresholdHours) {
+        continue;
+      }
+
+      const sent = await sendReminderEmail(
+        user.email,
+        group.title,
+        group.daysPerWeek,
+        group.questionsPerDay
+      );
+      if (sent) {
+        member.lastReminderSentAt = new Date();
+        await group.save();
+        sentCount += 1;
       }
     }
   }

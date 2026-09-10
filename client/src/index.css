@@ -11,9 +11,9 @@
   --color-border: #232329;
   --color-text: #edebe6;
   --color-text-muted: #8a8892;
-  --color-accent: #c1443b;
-  --color-accent-soft: rgba(193, 68, 59, 0.12);
-  --color-accent-border: rgba(193, 68, 59, 0.4);
+  --color-accent: #7c5cc0;
+  --color-accent-soft: rgba(124, 92, 192, 0.12);
+  --color-accent-border: rgba(124, 92, 192, 0.4);
 
   --font-display: 'Fraunces', serif;
   --font-sans: 'Inter', system-ui, sans-serif;

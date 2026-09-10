@@ -8,6 +8,7 @@ function formatDate(dateStr) {
 
 export default function JobsTable({ jobs }) {
   const [search, setSearch] = useState('');
+  const [showAppliedOnly, setShowAppliedOnly] = useState(false);
   const [appliedIds, setAppliedIds] = useState(() => {
     const saved = localStorage.getItem('appliedJobs');
     return saved ? JSON.parse(saved) : {};
@@ -21,7 +22,11 @@ export default function JobsTable({ jobs }) {
     });
   }
 
+  const appliedCount = Object.values(appliedIds).filter(Boolean).length;
+
   const filteredJobs = jobs.filter((job) => {
+    if (showAppliedOnly && !appliedIds[job._id]) return false;
+
     const term = search.toLowerCase();
     return (
       job.company?.toLowerCase().includes(term) ||
@@ -32,13 +37,25 @@ export default function JobsTable({ jobs }) {
 
   return (
     <div>
-      <input
-        type="text"
-        placeholder="Search by company, role, or location..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="mb-4 w-full max-w-md rounded-md border border-(--color-border) bg-(--color-surface) px-4 py-2 text-sm placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)"
-      />
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <input
+          type="text"
+          placeholder="Search by company, role, or location..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full max-w-md rounded-md border border-(--color-border) bg-(--color-surface) px-4 py-2 text-sm placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)"
+        />
+        <button
+          onClick={() => setShowAppliedOnly((v) => !v)}
+          className={`whitespace-nowrap rounded-md border px-4 py-2 text-sm transition ${
+            showAppliedOnly
+              ? 'border-(--color-accent) bg-(--color-accent)/10 text-(--color-accent)'
+              : 'border-(--color-border) hover:border-(--color-accent)'
+          }`}
+        >
+          {showAppliedOnly ? 'Showing applied' : `View applied (${appliedCount})`}
+        </button>
+      </div>
 
       <p className="mb-2 text-xs text-(--color-text-muted)">
         Showing {filteredJobs.length} of {jobs.length} internships
@@ -53,7 +70,7 @@ export default function JobsTable({ jobs }) {
               <th className="px-4 py-3">Location</th>
               <th className="px-4 py-3">Application/Link</th>
               <th className="px-4 py-3">Date Posted</th>
-              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3 text-center">Status</th>
               <th className="px-4 py-3">Applied</th>
             </tr>
           </thead>
@@ -69,7 +86,7 @@ export default function JobsTable({ jobs }) {
                     <a href={job.url} target="_blank" rel="noreferrer" className="rounded-md bg-(--color-surface) border border-(--color-border) px-3 py-1.5 text-xs hover:border-(--color-accent) transition">Apply</a>
                   </td>
                   <td className="px-4 py-4 text-(--color-text-muted)">{formatDate(job.datePosted)}</td>
-                  <td className="px-4 py-4">
+                  <td className="px-4 py-4 text-center">
                     <span className={`inline-flex h-4 w-4 rounded-full border ${isApplied ? 'bg-green-500 border-green-400' : 'bg-red-500 border-red-400'}`} style={{ minWidth: '1rem', minHeight: '1rem' }} />
                   </td>
                   <td className="px-4 py-4">

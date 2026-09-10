@@ -19,6 +19,7 @@ export default function StudyGroups() {
   const [pendingGroupId, setPendingGroupId] = useState(null);
   const [openGroup, setOpenGroup] = useState(null);
   const [activityGroup, setActivityGroup] = useState(null);
+  const [joinMessage, setJoinMessage] = useState('');
 
   const loadGroups = useCallback(() => {
     setLoading(true);
@@ -45,7 +46,17 @@ export default function StudyGroups() {
       method: 'POST',
       credentials: 'include',
     });
-    if (res.ok) loadGroups();
+    const data = await res.json();
+
+    if (!res.ok) {
+      setJoinMessage(data.error || 'Something went wrong. Try again.');
+      return;
+    }
+
+    setJoinMessage(
+      data.requested ? 'Request sent — the group creator will need to approve you.' : ''
+    );
+    loadGroups();
   }
 
   function handleJoin(groupId) {
@@ -82,8 +93,6 @@ export default function StudyGroups() {
       transition={{ duration: 0.35, ease: 'easeOut' }}
       className="w-full px-4 sm:px-6 lg:px-12 pt-16 sm:pt-24 pb-10 sm:pb-16"
     >
-      <h1 className="text-3xl font-bold mb-6">Study Groups</h1>
-
       <FadeInSection>
         <AccountSettingsBar />
       </FadeInSection>
@@ -108,6 +117,10 @@ export default function StudyGroups() {
         <p className="text-(--color-text-muted) mb-6">
           Log in to join or create a study group.
         </p>
+      )}
+
+      {joinMessage && (
+        <p className="text-(--color-accent) text-sm mb-6">{joinMessage}</p>
       )}
 
       {tab === 'mine' && (
