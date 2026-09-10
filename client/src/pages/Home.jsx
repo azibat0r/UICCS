@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import Hero from '../components/Hero.jsx';
+import ResultsHighlight from '../components/ResultsHighlight.jsx';
 import StudyGroupsHighlight from '../components/StudyGroupsHighlight.jsx';
 import FadeInSection from '../components/FadeInSection.jsx';
 
@@ -13,6 +14,7 @@ export default function Home() {
       <FadeInSection>
         <Hero />
       </FadeInSection>
+      <ResultsHighlight />
       <FadeInSection>
         <StudyGroupsHighlight />
       </FadeInSection>

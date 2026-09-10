@@ -18,7 +18,7 @@ export default function StudyGroupsHighlight() {
       <div className="mt-8">
         <Link
           to="/groups"
-          className="rounded-full border border-(--color-border) px-6 py-3 text-sm font-medium transition hover:border-(--color-accent-border)"
+          className="rounded-full bg-(--color-accent) px-6 py-3 text-sm font-medium text-(--color-bg) transition hover:opacity-90"
         >
           Explore study groups
         </Link>

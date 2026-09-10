@@ -1,5 +1,9 @@
 const Group = require('../models/Group');
 const Submission = require('../models/Submission');
+// Not used directly, but Group.populate('members.user') needs the 'User'
+// model registered with Mongoose - required here so this module works
+// standalone instead of relying on some other file having loaded it first.
+require('../models/User');
 const { sendReminderEmail } = require('./email');
 
 const THRESHOLD_HOURS = {

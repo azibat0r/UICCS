@@ -23,7 +23,6 @@ export default function Navbar() {
       <Link to="/" onClick={() => setMenuOpen(false)} className="hover:text-(--color-text) transition">Home</Link>
       <Link to="/feed" onClick={() => setMenuOpen(false)} className="hover:text-(--color-text) transition">Internship Feed</Link>
       <Link to="/groups" onClick={() => setMenuOpen(false)} className="hover:text-(--color-text) transition">Study Groups</Link>
-      <Link to="/contact" onClick={() => setMenuOpen(false)} className="hover:text-(--color-text) transition">Contact</Link>
     </>
   );
 
