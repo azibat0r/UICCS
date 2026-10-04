@@ -1,20 +1,8 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
 const Survey = require('../models/Survey');
+const { getUserIdFromReq } = require('../middleware/auth');
 
 const router = express.Router();
-const jwtSecret = process.env.JWT_SECRET;
-
-function getUserIdFromReq(req) {
-  return new Promise((resolve, reject) => {
-    const { token } = req.cookies;
-    if (!token) return reject('Not logged in');
-    jwt.verify(token, jwtSecret, {}, (err, userData) => {
-      if (err) return reject(err);
-      resolve(userData.id);
-    });
-  });
-}
 
 // GET /api/survey/mine - has this user already answered?
 router.get('/mine', async (req, res) => {

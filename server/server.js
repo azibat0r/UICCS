@@ -3,6 +3,11 @@ const cors = require('cors');
 const cron = require('node-cron');
 require('dotenv').config();
 
+if (!process.env.JWT_SECRET) {
+  console.error('FATAL: JWT_SECRET is not set. Add JWT_SECRET=<a long random string> to server/.env and restart.');
+  process.exit(1);
+}
+
 const connectDB = require('./config/db');
 const jobsRouter = require('./routes/jobs');
 const { syncInternships } = require('./services/githubSync');
